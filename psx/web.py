@@ -56,9 +56,6 @@ class DataReader:
 
         data = [self.get_psx_data(ticker, dates)[start: end] for ticker in tickers]
 
-        if len(data) == 1:
-            return data[0]
-
         return pd.concat(data, keys=tickers, names=["Ticker", "Date"])
 
 
