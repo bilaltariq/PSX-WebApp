@@ -9,6 +9,12 @@ db_instance = Database(db_name)
 data_mgmt = DataManagement(db_instance)
 
 
+def insert_meta_data(df, table_name):
+    db_instance.connect()
+    ddl_for_data = db_instance.df_to_sqlite_dict(df)
+    db_instance.create_table(table_name=table_name, columns_dict=ddl_for_data)
+    db_instance.insert_dataframe(table_name=table_name, dataframe=df, if_exists_m='replace')
+
 def insert_stk_data(data_table, table_name, insert_type):
 
     db_instance.connect()
@@ -29,11 +35,15 @@ def get_data(company, start_date, end_date):
 
 def main():
     start_date = datetime.date(2015, 1, 1)
-    end_date = datetime.date(2024, 1, 30)
+    end_date = datetime.date(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day)
     table = "psx_data"
+
+    insert_meta_data(tickers, 'meta_data')
 
     sector_company_name_dict = tickers.groupby('sectorName')['name'].agg(list).to_dict()
     company_name_symbol_dict = tickers.groupby('name')['symbol'].agg(list).to_dict()
+
+    print(tickers.head(5))
 
     for sector, companies in sector_company_name_dict.items():
         if sector == 'FERTILIZER':
